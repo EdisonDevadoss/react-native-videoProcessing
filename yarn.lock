@@ -569,6 +569,10 @@
     lodash "^4.17.11"
     to-fast-properties "^2.0.0"
 
+"@ptomasroos/react-native-multi-slider@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@ptomasroos/react-native-multi-slider/-/react-native-multi-slider-1.0.0.tgz#a4ea27b1320b93a1db9f696c24789695df6c9f30"
+
 abab@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/abab/-/abab-2.0.0.tgz#aba0ab4c5eee2d4c79d3487d85450fb2376ebb0f"
@@ -4576,6 +4580,10 @@ react-native-document-picker@^2.3.0:
 react-native-image-picker@^0.28.0:
   version "0.28.0"
   resolved "https://registry.yarnpkg.com/react-native-image-picker/-/react-native-image-picker-0.28.0.tgz#e3f26df170ea932e9c0404624fbced2f59a300e3"
+
+react-native-media-meta@^0.0.10:
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/react-native-media-meta/-/react-native-media-meta-0.0.10.tgz#097cc19d04505258e481547bcfd16db6d390e3dd"
 
 react-native-video-processing@^1.20.0:
   version "1.20.0"
