@@ -9,14 +9,26 @@ import {
   DocumentPickerUtil
 } from "react-native-document-picker";
 import ImagePicker from "react-native-image-picker";
+import MediaMeta from "react-native-media-meta";
+import MultiSlider from "@ptomasroos/react-native-multi-slider";
 
 class VideoEditingScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      fileUri: null
+      fileUri: null,
+      videoDuration: 0,
+      multiSliderValue: [0],
+      startTime: 0,
+      endTime: 1000
     };
   }
+
+  // millisToMinutesAndSeconds(millis) {
+  //   let minutes = Math.floor(millis / 60000);
+  //   let seconds = ((millis % 60000) / 1000).toFixed(0);
+  //   return parseInt(minutes + . + (seconds < 10 ? "0" : "") + seconds);
+  // }
   pickDocument = () => {
     const options = {
       mediaType: "video"
@@ -32,10 +44,19 @@ class VideoEditingScreen extends React.Component {
         console.log("User tapped custom button: ", response.customButton);
       } else {
         console.log("response is", response);
-        // const source = { uri: response.uri };
-
-        // You can also display the image using data:
-        // const source = { uri: 'data:image/jpeg;base64,' + response.data };
+        //Get duration
+        MediaMeta.get(response.path)
+          .then(metadata => {
+            console.log(metadata);
+            const duration = parseInt(metadata.duration);
+            const totalSec = duration / 1000;
+            console.log("totalSec is", totalSec);
+            this.setState({
+              videoDuration: totalSec,
+              multiSliderValue: [...this.state.multiSliderValue, totalSec]
+            });
+          })
+          .catch(err => console.error(err));
 
         this.setState({
           fileUri: response.path
@@ -43,11 +64,11 @@ class VideoEditingScreen extends React.Component {
       }
     });
   };
+  //Video trim
   trimVideo() {
-    console.log("trimVideo is called!");
     const options = {
-      startTime: 5,
-      endTime: 20,
+      startTime: this.state.startTime,
+      endTime: this.state.endTime,
       saveToCameraRoll: true, // default is false // iOS only
       saveWithCurrentDate: true // default is false // iOS only
     };
@@ -60,7 +81,6 @@ class VideoEditingScreen extends React.Component {
       .catch(console.warn);
   }
   compressVideo() {
-    console.log("compressVideo is called!");
     const options = {
       width: 720,
       height: 1280,
@@ -86,22 +106,19 @@ class VideoEditingScreen extends React.Component {
       .catch(console.warn);
   }
 
-  getVideoInfo() {
-    this.videoPlayerRef
-      .getVideoInfo()
-      .then(info => console.log(info))
-      .catch(console.warn);
-  }
-  onLoad = value => {
-    console.log("onLoad is", value);
+  multiSliderValuesChange = values => {
+    console.log("values is", values);
+    this.setState({
+      multiSliderValue: values,
+      startTime: values[0],
+      endTime: values[1]
+    });
   };
   render() {
     return (
-      <View>
-        <Button title={"Video picker"} onPress={this.pickDocument.bind(this)} />
-
+      <View style={styles.container}>
         {this.state.fileUri ? (
-          <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
+          <View>
             <VideoPlayer
               ref={ref => (this.videoPlayerRef = ref)}
               play={true} // default false
@@ -111,25 +128,32 @@ class VideoEditingScreen extends React.Component {
               playerWidth={300} // iOS only
               playerHeight={500} // iOS only
               height={300}
-              onLoad={e => console.log("e", e)}
               resizeMode={VideoPlayer.Constants.resizeMode.COVER}
               onChange={({ nativeEvent }) => console.log({ nativeEvent })} // get Current time on every second
             />
-            <Trimmer
-              source={this.state.fileUri}
-              height={150}
-              width={300}
-              onTrackerMove={e => console.log(e.currentTime)} // iOS only
-              //currentTime={this.video.currentTime} // use this prop to set tracker position iOS only
-              themeColor={"white"} // iOS only
-              thumbWidth={30} // iOS only
-              trackerColor={"green"} // iOS only
-              onChange={e => console.log(e.startTime, e.endTime)}
-              onTrackerMove={() => this.trimVideo()}
+            <View style={styles.textView}>
+              <Text>{`Stat From: ${this.state.multiSliderValue[0]} `}</Text>
+              <Text>{`To End: ${this.state.multiSliderValue[1]}  `}</Text>
+            </View>
+            <MultiSlider
+              values={[
+                this.state.multiSliderValue[0],
+                this.state.multiSliderValue[1]
+              ]}
+              sliderLength={280}
+              onValuesChange={this.multiSliderValuesChange}
+              min={0}
+              max={this.state.multiSliderValue[1]}
+              step={1}
             />
+            <Button title={"Trim Video"} onPress={() => this.trimVideo()} />
           </View>
-        ) : null}
-        <Button title={"Video Trim"} onPress={() => this.trimVideo()} />
+        ) : (
+          <Button
+            title={"Choose File"}
+            onPress={() => this.pickDocument(this)}
+          />
+        )}
       </View>
     );
   }

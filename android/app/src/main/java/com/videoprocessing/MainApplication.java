@@ -3,6 +3,7 @@ package com.videoprocessing;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.mybigday.rnmediameta.RNMediaMetaPackage;
 import com.imagepicker.ImagePickerPackage;
 import com.reactnativedocumentpicker.ReactNativeDocumentPicker;
 import com.facebook.react.ReactNativeHost;
@@ -26,6 +27,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNMediaMetaPackage(),
             new ImagePickerPackage(),
             new ReactNativeDocumentPicker(),
           new RNVideoProcessingPackage()
